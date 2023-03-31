@@ -98,6 +98,3 @@ async function run() {
 run()
 
 export default run // For testing
-
-//write json array repo1, repo2, repo3
-
