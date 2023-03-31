@@ -42,11 +42,14 @@ jobs:
         - name: Commit and push compiled code
           run: |
             cd main
-            git config --local user.name "GitHub Actions"
+            mkdir -p dist
+            cd dist
+            git config --local user.name "github-actions[bot]"
             git add dist
-            git commit -m "Update compiled code"
+            git commit -m "Update dist folder"
             git push
 
+          
           
 
       
