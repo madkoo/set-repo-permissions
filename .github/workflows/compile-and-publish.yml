@@ -23,11 +23,12 @@ jobs:
           with:
             node-version: '16'
             cache: 'npm'
-        - run: npm install
-        - run: npm run build
-        - run: npm run package
+        - name: Install dependencies
+          run: npm ci
 
-
+        - name: Build
+          run: npm run all
+        
         - uses: actions/upload-artifact@v2
           with:
             name: dist
@@ -43,20 +44,22 @@ jobs:
           with:
             name: dist
             path: main/dist
-            
 
       # Commit and push the compiled code to the main branch dist folder
         
         - name: Commit and push compiled code
           run: |
-            cd main
-            mkdir -p dist
-            git config --local user.name "github-actions[bot]"
-            git add dist
-            git commit -m "Update dist folder"
-            git push
+            if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
+              echo "Detected uncommitted changes after build.  See status below:"
+              git diff            
+              git config --global user.name "github-actions[bot]"
+              git add . 
+              git commit -m "update dist from build"
+              git push 
+            fi
+          working-directory: main
+          shell: bash
 
-          
           
 
       
