@@ -80,21 +80,20 @@ function run() {
             for (const repo of parsedRepos) {
                 //loop through the teams
                 for (const team of parsedTeams) {
+                    const teamData = team.split(',');
+                    const userOrTeamSlug = teamData[0].trim();
+                    const permission = teamData[1].trim();
                     if (actionType === 'TEAM') {
-                        const teamSlug = team.teamSlug;
-                        const teamPermission = team.permission;
-                        core.info(`map repository ${repo} to team: ${teamSlug}, with permission ${teamPermission}`);
-                        mapTeamToRepo(octokit, ownerAndorg, ownerAndorg, repo, teamSlug, teamPermission);
+                        core.info(`map repository ${repo} to team: ${userOrTeamSlug}, with permission ${permission}`);
+                        mapTeamToRepo(octokit, ownerAndorg, ownerAndorg, repo, userOrTeamSlug, permission);
                     }
                     else {
-                        const user = team.user;
-                        const userPermission = team.permission;
-                        core.info(`map repository ${repo} to user: ${user}, with permission ${userPermission}`);
+                        core.info(`map repository ${repo} to user: ${userOrTeamSlug}, with permission ${permission}`);
                         octokit.rest.repos.addCollaborator({
                             owner: ownerAndorg,
                             repo,
-                            username: user,
-                            permission: userPermission
+                            username: userOrTeamSlug,
+                            permission
                         });
                     }
                 }
