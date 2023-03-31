@@ -21,23 +21,33 @@ jobs:
         - run: npm install
         - run: npm run build
         - run: npm run package
+
         - uses: actions/upload-artifact@v2
           with:
             name: dist
             path: dist
+
         - uses: actions/checkout@v3
           with:
             ref: main
             path: main
+
         - uses: actions/download-artifact@v2
           with:
             name: dist
             path: main
-        - name: Commit and push
+
+      # Commit and push the compiled code to the main branch dist folder
+        
+        - name: Commit and push compiled code
           run: |
             cd main
             git config --local user.name "GitHub Actions"
-            git add .
-            git commit -m "Update composite action"
+            git add dist
+            git commit -m "Update compiled code"
             git push
 
+          
+
+      
+      
