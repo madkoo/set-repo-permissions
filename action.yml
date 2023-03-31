@@ -14,11 +14,11 @@ inputs:
   teamsOrUsers :
     description: "JSON array of teams or users to set permissions for"
     required: true
-  action-type :
+  action-type:
     description: "Action type to perform. Can be 'USER' or 'TEAM'. Default is TEAM"
     required: true
     default: "TEAM"
-  issue-nr :
+  issue-nr:
     description: "Issue number to comment on"
     required: true
   target-repo :

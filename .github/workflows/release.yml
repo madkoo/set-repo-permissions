@@ -1,0 +1,35 @@
+# create a release workflow that will take in version number and create a release and tag it
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number to release'
+        required: true
+        default: '0.0.0'
+
+jobs:
+    release:
+        name: Create Release
+        runs-on: ubuntu-latest
+        steps:
+        
+        - uses: actions/checkout@v2
+          with:
+            fetch-depth: 0
+            token: ${{ secrets.GITHUB_TOKEN }}
+
+        - name: Create Release
+          id: create_release
+          uses: actions/create-release@v1
+          env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+              tag_name: ${{ github.event.inputs.version }}
+              release_name: Release ${{ github.event.inputs.version }}
+              draft: false
+              prerelease: false
+
+
+        

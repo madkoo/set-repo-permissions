@@ -40,12 +40,13 @@ async function run() {
     for (const repo of parsedRepos) {
       //loop through the teams
       for (const team of parsedTeams) {
-        if (actionType === 'TEAM') {
-          const teamSlug = team.teamSlug
-          const teamPermission = team.permission
+        const teamData = team.split(',')
+        const userOrTeamSlug = teamData[0].trim()
+        const permission = teamData[1].trim()
 
+        if (actionType === 'TEAM') {
           core.info(
-            `map repository ${repo} to team: ${teamSlug}, with permission ${teamPermission}`
+            `map repository ${repo} to team: ${userOrTeamSlug}, with permission ${permission}`
           )
 
           mapTeamToRepo(
@@ -53,22 +54,19 @@ async function run() {
             ownerAndorg,
             ownerAndorg,
             repo,
-            teamSlug,
-            teamPermission
+            userOrTeamSlug,
+            permission
           )
         } else {
-          const user = team.user
-          const userPermission = team.permission
-
           core.info(
-            `map repository ${repo} to user: ${user}, with permission ${userPermission}`
+            `map repository ${repo} to user: ${userOrTeamSlug}, with permission ${permission}`
           )
 
           octokit.rest.repos.addCollaborator({
             owner: ownerAndorg,
             repo,
-            username: user,
-            permission: userPermission
+            username: userOrTeamSlug,
+            permission
           })
         }
       }
