@@ -35,11 +35,13 @@ jobs:
           with:
             ref: main
             path: main
+            token: ${{ secrets.REPO_TOKEN }}
 
         - uses: actions/download-artifact@v2
           with:
             name: dist
             path: main/dist
+            
 
       # Commit and push the compiled code to the main branch dist folder
         
