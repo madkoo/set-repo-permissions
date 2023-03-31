@@ -33,4 +33,8 @@ jobs:
         - name: Commit and push
           run: |
             cd main
-            git config --local user.email "
+            git config --local user.name "GitHub Actions"
+            git add .
+            git commit -m "Update composite action"
+            git push
+
