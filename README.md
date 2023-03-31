@@ -4,7 +4,7 @@
 
 ```yaml
 
-- uses: madkoo/composite-actions@v1
+- uses: madkoo/update-repo-permissions@v1
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
     target-org: "Target organization name where repositories are located" 
