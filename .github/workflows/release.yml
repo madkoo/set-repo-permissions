@@ -54,6 +54,7 @@ jobs:
             prerelease: false
             artifacts: |
               dist/*
+            allowUpdates: true
       
 
 
