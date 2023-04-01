@@ -31,28 +31,27 @@ jobs:
           id: first_number
           run: echo "version=$(echo ${{ github.event.inputs.version }} | cut -d. -f1)" >> $GITHUB_OUTPUT     
 
-        # - name: Create Release
-        #   id: create_release
-        #   uses: actions/create-release@v1
-        #   env:
-        #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        #   with:
-        #       tag_name: 'v${{ steps.first_number.outputs.version }}'
-        #       release_name: Release v${{ github.event.inputs.version }}
-        #       draft: false
-        #       prerelease: false
-
-        # create a release and tag it or replace tag if it already exists
-        - uses: ncipollo/release-action@v1
+        - name: Create Release
+          id: create_release
+          uses: actions/create-release@v1
+          env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
-            token: ${{ secrets.GITHUB_TOKEN }}
-            tag: 'v${{ github.event.inputs.version  }}'
-            name: Release v${{ github.event.inputs.version }}
-            body: |
-              Release v${{ github.event.inputs.version }}
-            draft: false
-            prerelease: false
-            allowUpdates: true
+              tag_name: 'v${{ github.event.inputs.version }}'
+              release_name: Release v${{ github.event.inputs.version }}
+              draft: false
+              prerelease: false
+        
+        - name: Git config
+          run: |
+            git config user.name github-actions
+            git config user.email github-actions@github.com
+        - name: Tag new target
+          run: git tag -f v${{ steps.first_number.outputs.version }} v${{ github.event.inputs.version }}
+        - name: Push new tag
+          run: git push origin v${{ steps.first_number.outputs.version }} --force
+
+        
       
 
 
