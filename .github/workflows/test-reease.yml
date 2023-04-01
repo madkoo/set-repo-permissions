@@ -27,6 +27,6 @@ jobs:
           run: |
             ver=$(echo ${{ github.event.inputs.version }} | cut -d. -f1)
             echo $ver
-            echo "version=$(echo ${{ github.event.inputs.version }} | cut -d. -f1)" >> $GITHUB_OUTPUTS
+            echo "version=$(echo ${{ github.event.inputs.version }} | cut -d. -f1)" >> $GITHUB_OUTPUT
             
         - run: echo 'v${{ steps.first_number.outputs.version }}'
