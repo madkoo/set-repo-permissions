@@ -43,9 +43,10 @@ async function run() {
             userOrTeamSlug,
             permission
           )
-          if (res) { //if the team was mapped to the repository and the permission was updated
-            // push repo with permission and team to the list of repositories to be updated
-            updateReposWithPermissions.push(`Repository: '${repo}' with Team: ${userOrTeamSlug} ,permission: ${permission}`)
+          if (res) {
+            updateReposWithPermissions.push(
+              `Repository: '${repo}' with Team: ${userOrTeamSlug} ,permission: ${permission}`
+            )
           }
         } else {
           const res = await mapUserToRepo(
@@ -55,15 +56,17 @@ async function run() {
             userOrTeamSlug,
             permission
           )
-          if (res) { //if the user was mapped to the repository
-            updateReposWithPermissions.push(`Repository: '${repo}' with User: ${userOrTeamSlug} ,permission: ${permission}`)
+          if (res) {
+            updateReposWithPermissions.push(
+              `Repository: '${repo}' with User: ${userOrTeamSlug} ,permission: ${permission}`
+            )
+          }
         }
       }
     }
-
     await sendSuccessMessage(
       octokit,
-      updateReposWithPermissions
+      updateReposWithPermissions,
       issueNr,
       ownerAndorg,
       targetRepo
