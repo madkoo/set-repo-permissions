@@ -11,6 +11,7 @@ on:
         - main
         paths-ignore:
         - 'dist/**'
+        - '.github/**'
 
 jobs:
     build:
