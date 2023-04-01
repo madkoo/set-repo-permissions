@@ -25,8 +25,8 @@ jobs:
         - name: Get first number from version
           id: first_number
           run: |
-            ver = echo ${{ github.event.inputs.version }} | cut -d. -f1
-            console.log(ver)
+            ver=$(echo ${{ github.event.inputs.version }} | cut -d. -f1)
+            echo $ver
             echo "version=$(echo ${{ github.event.inputs.version }} | cut -d. -f1)" >> $GITHUB_ENV 
             
         - run: echo 'v${{ steps.first_number.outputs.version }}'
