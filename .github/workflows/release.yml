@@ -28,7 +28,7 @@ jobs:
 
         - name: Get first number from version
           id: first_number
-          run: echo "version=$(echo ${{ github.event.inputs.version }} | cut -d. -f1)" >> $GITHUB_ENV     
+          run: echo "version=$(echo ${{ github.event.inputs.version }} | cut -d. -f1)" >> $GITHUB_OUTPUT     
 
         - name: Create Release
           id: create_release
