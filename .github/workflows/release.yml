@@ -1,6 +1,11 @@
 # create a release workflow that will take in version number and create a release and tag it
 name: Release
 
+permissions:
+  contents: write
+  packages: write
+  
+
 on:
   workflow_dispatch:
     inputs:
