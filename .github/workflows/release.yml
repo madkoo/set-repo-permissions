@@ -11,7 +11,7 @@ on:
         
 jobs:
     release:
-        if: github.repository_owner == "madkoo"
+        if: github.repository_owner == 'madkoo'
         name: Create Release
         runs-on: ubuntu-latest
         steps:
