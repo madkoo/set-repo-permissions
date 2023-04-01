@@ -41,24 +41,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const rest_1 = __nccwpck_require__(5375);
+const utils_1 = __nccwpck_require__(918);
 //map a team to a repository
-const mapTeamToRepo = function (octokit, org, owner, repo, team_slug, permission) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            return yield octokit.rest.teams.addOrUpdateRepoPermissionsInOrg({
-                org,
-                team_slug,
-                owner,
-                repo,
-                permission
-            });
-        }
-        catch (e) {
-            console.log(e);
-            return;
-        }
-    });
-};
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -70,12 +54,17 @@ function run() {
             const issueNr = core.getInput('issue-nr');
             const targetRepo = core.getInput('target-repo');
             const octokit = new rest_1.Octokit({ auth: token });
-            if (!repositories) {
+            if (!repositories || repositories.length === 0) {
                 core.setFailed('No repositories found');
+                return;
+            }
+            if (!teamsOrUser || teamsOrUser.length === 0) {
+                core.setFailed('No teams or users found');
                 return;
             }
             const parsedRepos = JSON.parse(repositories);
             const parsedTeams = JSON.parse(teamsOrUser);
+            const updateReposWithPermissions = [''];
             //loop through the repositories
             for (const repo of parsedRepos) {
                 //loop through the teams
@@ -84,38 +73,20 @@ function run() {
                     const userOrTeamSlug = teamData[0].trim();
                     const permission = teamData[1].trim();
                     if (actionType === 'TEAM') {
-                        core.info(`map repository ${repo} to team: ${userOrTeamSlug}, with permission ${permission}`);
-                        mapTeamToRepo(octokit, ownerAndorg, ownerAndorg, repo, userOrTeamSlug, permission);
+                        const res = yield (0, utils_1.mapTeamToRepo)(octokit, ownerAndorg, ownerAndorg, repo, userOrTeamSlug, permission);
+                        if (res) {
+                            updateReposWithPermissions.push(`Repository: '${repo}' with Team: ${userOrTeamSlug} ,permission: ${permission}`);
+                        }
                     }
                     else {
-                        core.info(`map repository ${repo} to user: ${userOrTeamSlug}, with permission ${permission}`);
-                        octokit.rest.repos.addCollaborator({
-                            owner: ownerAndorg,
-                            repo,
-                            username: userOrTeamSlug,
-                            permission
-                        });
+                        const res = yield (0, utils_1.mapUserToRepo)(octokit, ownerAndorg, repo, userOrTeamSlug, permission);
+                        if (res) {
+                            updateReposWithPermissions.push(`Repository: '${repo}' with User: ${userOrTeamSlug} ,permission: ${permission}`);
+                        }
                     }
                 }
             }
-            const body = `
-        ## 🎉 Mapped repositories to team
-      
-        ### Teams: 
-        \`\`\`
-        ${parsedTeams}
-        \`\`\`
-        ### Repositories:
-        \`\`\`
-        ${repositories}
-        \`\`\`
-      `;
-            yield octokit.rest.issues.createComment({
-                issue_number: Number(issueNr),
-                owner: ownerAndorg,
-                repo: targetRepo,
-                body: body.replace(/  +/g, '')
-            });
+            yield (0, utils_1.sendSuccessMessage)(octokit, updateReposWithPermissions, issueNr, ownerAndorg, targetRepo);
         }
         catch (error) {
             core.setFailed(error.message);
@@ -124,6 +95,118 @@ function run() {
 }
 run();
 exports["default"] = run; // For testing
+
+
+/***/ }),
+
+/***/ 918:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.sendSuccessMessage = exports.mapUserToRepo = exports.mapTeamToRepo = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+const mapTeamToRepo = function (octokit, org, owner, repo, team_slug, permission) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            core.info(`map repository ${repo} to team: ${team_slug}, with permission ${permission}`);
+            yield octokit.rest.teams.addOrUpdateRepoPermissionsInOrg({
+                org,
+                team_slug,
+                owner,
+                repo,
+                permission
+            });
+            return true;
+        }
+        catch (e) {
+            core.warning(`Could not map team ${team_slug} to repository ${repo} in org ${org} with permission ${permission}`);
+            console.log(e);
+            return false;
+        }
+    });
+};
+exports.mapTeamToRepo = mapTeamToRepo;
+const mapUserToRepo = function (octokit, ownerAndorg, repo, userOrTeamSlug, permission) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            core.info(`map repository ${repo} to user: ${userOrTeamSlug}, with permission ${permission}`);
+            octokit.rest.repos.addCollaborator({
+                owner: ownerAndorg,
+                repo,
+                username: userOrTeamSlug,
+                permission
+            });
+            return true;
+        }
+        catch (e) {
+            core.warning(`Could not map user ${userOrTeamSlug} to repository ${repo} in org ${ownerAndorg} with permission ${permission}`);
+            console.log(e);
+            return false;
+        }
+    });
+};
+exports.mapUserToRepo = mapUserToRepo;
+const sendSuccessMessage = function (octokit, updateReposWithPermissions, issueNr, ownerAndorg, targetRepo) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            core.info(`Send success message to issue ${issueNr} in repository ${targetRepo}`);
+            const body = `
+      ## 🎉 Mapped repositories to team
+   
+      ### Repositories with Teams/Users and permissions:
+      \`\`\`
+      ${updateReposWithPermissions}
+      \`\`\`
+    `;
+            yield octokit.rest.issues.createComment({
+                issue_number: Number(issueNr),
+                owner: ownerAndorg,
+                repo: targetRepo,
+                body: body.replace(/  +/g, '')
+            });
+        }
+        catch (e) {
+            core.warning(`Could not send success message to issue ${issueNr} in repository ${targetRepo}`);
+            console.log(e);
+            return;
+        }
+    });
+};
+exports.sendSuccessMessage = sendSuccessMessage;
 
 
 /***/ }),
