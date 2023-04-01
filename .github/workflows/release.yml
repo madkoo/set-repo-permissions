@@ -46,6 +46,8 @@ jobs:
           run: |
             git config user.name github-actions
             git config user.email github-actions@github.com
+        - name: git fetch
+          run: git fetch --tags
         - name: Tag new target
           run: git tag -f v${{ steps.first_number.outputs.version }} v${{ github.event.inputs.version }}
         - name: Push new tag
