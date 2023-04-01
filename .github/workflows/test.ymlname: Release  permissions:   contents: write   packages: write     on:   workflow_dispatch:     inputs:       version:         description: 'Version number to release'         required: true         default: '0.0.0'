@@ -1,0 +1,32 @@
+name: Release-test
+
+permissions:
+  contents: write
+  packages: write
+  
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number to release'
+        required: true
+        default: '0.0.0'
+        
+        
+jobs:
+    release:
+       
+        name: Create Release
+        runs-on: ubuntu-latest
+        steps:
+        
+
+        - name: Get first number from version
+          id: first_number
+          run: |
+            ver = echo ${{ github.event.inputs.version }} | cut -d. -f1
+            console.log(ver)
+            echo "version=$(echo ${{ github.event.inputs.version }} | cut -d. -f1)" >> $GITHUB_ENV 
+            
+        - run: echo 'v${{ steps.first_number.outputs.version }}'
