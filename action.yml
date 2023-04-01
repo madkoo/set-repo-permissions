@@ -1,4 +1,4 @@
-name: 'Set user or team permissions for repositories'
+name: 'Set repository permissions'
 description: 'A action used to set user or team permissions for repositories'
 author: 'Madis Koosaar'
 inputs:
