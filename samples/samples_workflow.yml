@@ -1,0 +1,78 @@
+name: Migration (Map teams to repositories)
+
+permissions:
+  issues: write
+  actions: read
+
+on:
+  issues:
+      types:
+        - opened
+        - reopened
+
+jobs:
+  map-teams-to-repositories:
+    name: Map teams to repositories
+    runs-on: ubuntu-latest 
+    steps:
+    
+      - name: Run Issue form parser
+        id: parse
+        uses: peter-murray/issue-forms-body-parser@v2.0.0
+        with:
+          issue_id: ${{ github.event.issue.number }}
+          separator: '###'
+          label_marker_start: '>>'
+          label_marker_end: '<<'
+          
+      - name: Publish output variables
+        uses: actions/github-script@v6
+        id: generate_variables
+        env:
+          parsed_payload: ${{ steps.parse.outputs.payload  }}
+        with:
+          script: |
+            parsedPayload = JSON.parse(process.env.parsed_payload);
+            const repositories = parsedPayload['Repositories'];
+            const teamsOrUsers = parsedPayload['Teams-or-Users'];
+            const actionType = parsedPayload['Action-type'];
+            const org = context.payload.repository.owner.login;
+            const parsedRepos = JSON.stringify(repositories.split("\r\n").slice(1, -1));
+            const parsedTeamsOrUsers = JSON.stringify(teamsOrUsers.split("\r\n").slice(1, -1));
+            
+            console.log(parsedRepos)
+            console.log(parsedTeamsOrUsers)
+            core.setOutput('repositories', `${parsedRepos}`);
+            core.setOutput('teamsOrUsers', `${parsedTeamsOrUsers}`);
+            core.setOutput('actionType', `${actionType}`);
+            core.setOutput('organization', `${org}`);   
+      
+
+      - run: |
+          echo ${{github.event.repository.name}}
+          echo ${{github.event.issue.number}}
+
+      - uses: madkoo/set-repo-permissions@v1
+        with:
+          token: ${{ secrets.PAT }}
+          target-org: ${{steps.generate_variables.outputs.organization}} 
+          repositories: ${{steps.generate_variables.outputs.repositories}}
+          teamsOrUsers: ${{steps.generate_variables.outputs.teamsOrUsers}}
+          action-type: ${{steps.generate_variables.outputs.actionType}}
+          issue-nr: ${{github.event.issue.number}}
+          target-repo: ${{github.event.repository.name}} 
+    
+    
+
+      - if: ${{ failure() }}
+        name: Report failed migration
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const body = `:no_entry: **Team mapping to repos failed.** [View workflow run for details](${context.payload.repository.html_url}/actions/runs/${context.runId})`
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            })       
