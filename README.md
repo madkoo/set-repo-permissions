@@ -15,3 +15,9 @@
     target-repo: "repository name where the issue is located"
 
 ```
+
+## Sample worfklow and issue template can be found here:
+
+[Workflow](./samples/sample_issue_template.yml)
+
+[Issue template](./samples/sample_issue_template.md)

@@ -1,0 +1,44 @@
+name: Add permissions to repo
+description: Add permissions to repo
+title: "add permissions to repo"
+labels: []
+body:
+  - type: "input"
+    attributes:
+      label: ">>Target organization<<"
+      description: "GitHub target org"
+      placeholder: "MyOrg"
+    validations:
+      required: true
+  - type: textarea
+    id: repos
+    attributes:
+      label: ">>Repositories<<"
+      description: Please enter the repositories that you would like to migrate from GitHub Enterprise Server to GitHub Enterprise Cloud
+      render: csv
+      placeholder: |
+        your-repository-1
+        your-repository-2
+    validations:
+      required: true
+  - type: textarea
+    id: teamsOrUsers
+    attributes:
+      label: ">>Teams-or-Users<<"
+      description: "GitHub team to map migrated repositories to, possible permission values: admin, push, maintain, triage, or pull"
+      render: csv
+      placeholder: |
+        your-team-1,admin
+        your-team2-2,push
+    validations:
+      required: true
+  - type: dropdown
+    id: actionType
+    attributes:
+      label: ">>Action-type<<"
+      description: Choose either team or user action
+      options:
+        - TEAM
+        - USER
+    validations:
+      required: true
