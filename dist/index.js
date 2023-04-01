@@ -64,7 +64,8 @@ function run() {
             }
             const parsedRepos = JSON.parse(repositories);
             const parsedTeams = JSON.parse(teamsOrUser);
-            const updateReposWithPermissions = [''];
+            //create string array to store the repositories with the permissions
+            const updateReposWithPermissions = [];
             //loop through the repositories
             for (const repo of parsedRepos) {
                 //loop through the teams
