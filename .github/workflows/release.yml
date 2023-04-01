@@ -28,7 +28,7 @@ jobs:
 
         - name: Get first number from version
           id: first_number
-          run: echo 'first_number = $(echo ${{ github.event.inputs.version }} | cut -d. -f1)' >> $GITHUB_ENV     
+          run: echo "version=$(echo ${{ github.event.inputs.version }} | cut -d. -f1)" >> $GITHUB_ENV     
 
         - name: Create Release
           id: create_release
@@ -36,7 +36,7 @@ jobs:
           env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
-              tag_name: 'v${{ steps.first_number.outputs.first_number }}'
+              tag_name: 'v${{ steps.first_number.outputs.version }}'
               release_name: Release v${{ github.event.inputs.version }}
               draft: false
               prerelease: false
