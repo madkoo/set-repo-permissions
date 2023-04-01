@@ -52,8 +52,6 @@ jobs:
               Release v${{ github.event.inputs.version }}
             draft: false
             prerelease: false
-            artifacts: |
-              dist/*
             allowUpdates: true
       
 
