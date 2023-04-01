@@ -8,9 +8,10 @@ on:
         description: 'Version number to release'
         required: true
         default: '0.0.0'
-
+        
 jobs:
     release:
+        if: github.repository_owner == "madkoo"
         name: Create Release
         runs-on: ubuntu-latest
         steps:
