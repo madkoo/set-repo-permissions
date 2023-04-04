@@ -1,4 +1,8 @@
-# composite-actions
+# Set repository permissions
+
+This composite action enables to update permissions for Teams or users in a single or multiple repositories through a workflow
+
+
 
 ## usages:
 
